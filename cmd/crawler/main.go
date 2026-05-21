@@ -7,6 +7,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/chrisd313/web-crawler/internal/crawler"
 	"github.com/chrisd313/web-crawler/internal/fetcher"
@@ -16,7 +17,7 @@ import (
 func main() {
 	startURL := flag.String("url", "", "Starting URL to crawl (required)")
 	format := flag.String("format", "text", "Output format: text or json")
-	workers := flag.Int("workers", 5, "Number of concurrent workers")
+	workers := flag.Int("workers", 15, "Number of concurrent workers")
 	rps := flag.Float64("rate", 0, "Request rate limit (requests per second, 0 = unlimited)")
 	flag.Parse()
 
@@ -62,7 +63,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	start := time.Now()
 	for result := range results {
 		r.Report(result)
 	}
+	duration := time.Since(start)
+
+	fmt.Fprintf(os.Stderr, "Crawl completed in %v\n", duration)
 }
